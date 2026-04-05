@@ -1,0 +1,16 @@
+
+Brain storm ideas 
+
+        --> Linkedin posts, reachout people, medium blogs, youtube videos about system design of your projects designing
+        --> ye sab material github pr dal do and contribute open source and discuss about that on Linkedin and medium
+        --> also it will cost money but deploy your projects online all projects must be deployed atleast 10 - 12 full stack deep tech
+        apps must be deployed 
+
+            models : 
+                inventory
+                product - id, desc, quantity, name, image, image id, category, price, reviews
+                cart - userid, cartid, items/productid inside, 
+                orders - userid, orderid, itemsids, status, tracking info, 
+                payment - per order payment status, userid, orderid
+                notification - userid, data from db, notification info
+
