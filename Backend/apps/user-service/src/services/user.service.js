@@ -1,7 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import User from '../models/user.model.js';
+import bcrypt from 'bcryptjs';
+import User from '../models/user.models.js';
 import { JWT_SECRET } from '../config/index.js';
 
 const createUser = async (userData) => {
@@ -75,10 +75,13 @@ const loginUser = async (userData) => {
         throw new Error('Invalid credentials');
     }
 
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+
     // else return jwt token
     const token = jwt.sign({ userId: user._id, username: user.username }, JWT_SECRET, { expiresIn: '1h' }); // expires in 1 hour
 
-    return { user: user, token: token };
+    return { user: userWithoutPassword, token: token };
 
 
 };
@@ -103,6 +106,8 @@ const updateUserDetails = async (userId, updateData) => {
     if (updateData.email) user.email = updateData.email;
     if (updateData.username) user.username = updateData.username;
 
+    user.updatedAt = Date.now();
+
     const updatedUser = await user.save();
     const safeUser = updatedUser.toObject();
     delete safeUser.password;
@@ -118,7 +123,7 @@ const deleteUser = async (userId) => {
     if (result.deletedCount === 0) {
         throw new Error('User not found');
     }
-    
+
     return { message: 'User deleted successfully' };
 
 }

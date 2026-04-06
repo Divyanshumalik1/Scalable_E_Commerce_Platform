@@ -18,6 +18,11 @@ export const authMiddleware = (req, res, next) => {
     try{
         // This is so simple to do with the jwt library, it abstracts away all the complexity of verifying the token, checking its signature, and decoding its payload. It also handles token expiration and other security checks for you. You just need to provide the token and the secret key, and it will do the rest.
         const decoded = jwt.verify(token, JWT_SECRET);
+
+        if(!decoded || !decoded.userId){
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
         req.user = decoded;
         next();
 

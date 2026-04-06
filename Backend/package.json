@@ -1,0 +1,11 @@
+{
+  "name": "ecommerce-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:infra": "docker-compose up mongo redis -d",
+    "dev": "docker-compose up -d",
+    "down": "docker-compose down",
+    "logs": "docker-compose logs -f"
+  }
+}

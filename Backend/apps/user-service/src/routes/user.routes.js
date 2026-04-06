@@ -3,20 +3,22 @@ import { Router } from 'express';
 import { userSignupController, userLoginController, userFetchDetailsController, userUpdateDetailsController, userDeleteAccountController } from '../controllers/user.controllers.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 
-const router = Router();
+const userRouter = Router();
 
 // login ,signup, fetch user details, update user details, delete user account
 
 // Unprotected routes
 // POST /api/users/signup
-router.post('/signup', userSignupController);
+userRouter.post('/signup', userSignupController);
 // POST /api/users/login
-router.post('/login', userLoginController);
+userRouter.post('/login', userLoginController);
 
 // Protected routes
 // GET /api/users/user/:id
-router.get('/user/:id', authMiddleware, userFetchDetailsController);
+userRouter.get('/user/:id', authMiddleware, userFetchDetailsController);
 // PUT /api/users/user/:id
-router.put('/user/:id', authMiddleware, userUpdateDetailsController);
+userRouter.put('/user/:id', authMiddleware, userUpdateDetailsController);
 // DELETE /api/users/user/:id
-router.delete('/user/:id', authMiddleware, userDeleteAccountController);
+userRouter.delete('/user/:id', authMiddleware, userDeleteAccountController);
+
+export default userRouter;
