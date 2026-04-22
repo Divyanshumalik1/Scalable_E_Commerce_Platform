@@ -2,12 +2,10 @@
   "name": "order-service",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "order_app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/index.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init"
+    "start": "nodemon order_app.js"
   },
   "keywords": [],
   "author": "",
@@ -16,10 +14,12 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
+    "amqplib": "^1.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "mongoose": "^9.4.1",
+    "nodemon": "^3.1.14",
     "prisma": "^7.7.0"
   }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "@ecommerce/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./mq": "./message_queue.js",
+    "./queues": "./queues.js"
+  }
+}

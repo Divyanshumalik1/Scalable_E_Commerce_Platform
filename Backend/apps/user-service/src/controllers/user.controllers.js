@@ -1,5 +1,6 @@
 import express from 'express';
 import * as userService from '../services/user.service.js';
+import {publishUserCreated} from '../mq/producer.js';
 
 export const userSignupController = async (req, res) => {
 
@@ -7,6 +8,9 @@ export const userSignupController = async (req, res) => {
         //const userData = req.body;
         // call service layer to create user, store in db, return a jwt token for authentication
         const { user, token } = await userService.createUser(req.body);
+
+        await publishUserCreated(user); // ← ADD THIS (after user is saved)
+
         res.status(201).json({ user: user, token: token });
 
     } catch (err) {

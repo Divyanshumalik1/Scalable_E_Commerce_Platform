@@ -1,5 +1,13 @@
 import express from 'express';
-
+import {
+    fetchAllOrdersController,
+    updateOrderStatusController,
+    placeOrderController,
+    fetchOrderDetailsController,
+    fetchUserOrdersController,
+    cancelOrderController,
+    returnOrderController
+} from '../controllers/order.controllers.js';
 const orderRouter = express.Router();
 
 /*
@@ -23,3 +31,5 @@ orderRouter.get('/order/:id', fetchOrderDetailsController); // status, details, 
 orderRouter.get('/order/user/:userId', fetchUserOrdersController); // order history for a user
 orderRouter.post('/order/:id/cancel', cancelOrderController); // cancel an order
 orderRouter.post('/order/:id/return', returnOrderController); // return/exchange items in an order
+
+export default orderRouter;

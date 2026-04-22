@@ -10,7 +10,7 @@ const userRouter = Router();
 // Unprotected routes
 // POST /api/users/signup
 userRouter.post('/signup', userSignupController);
-// POST /api/users/login
+// POST /api/users/login/
 userRouter.post('/login', userLoginController);
 
 // Protected routes
