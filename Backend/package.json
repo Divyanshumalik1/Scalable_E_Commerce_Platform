@@ -10,5 +10,8 @@
   },
   "dependencies": {
     "amqplib": "^1.0.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/engines", "prisma"]
   }
 }

@@ -1,7 +1,8 @@
 import prisma from "../config/db.js";
+import { publishOrderPlaced, publishOrderStatusUpdated } from "../mq/producer.js";
 import { fetchOrders, updateOrders } from "../services/admin.order.service.js";
 import { createOrder, getOrderDetails, fetchUserOrders, cancelOrder, returnOrder } from "../services/user.order.service.js";
-
+import { publishOrderCancelled, publishOrderReturned } from "../mq/producer.js";
 
 // Admin controllers
 
@@ -45,6 +46,8 @@ const updateOrderStatusController = async (req, res) => {
 
         const updatedOrder = await updateOrders(id, status);
 
+        await publishOrderStatusUpdated(updatedOrder);
+
         res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
     } catch (err) {
         if (err.message === 'Order not found') {
@@ -63,13 +66,16 @@ const updateOrderStatusController = async (req, res) => {
 // orderRouter.post('/order', placeOrderController);
 const placeOrderController = async (req, res) => {
     try {
-        const { userId, productId, quantity } = req.body;
+        const { userId, productId, quantity, paymentMethodId } = req.body;
 
-        if (!userId || !productId || !quantity) {
-            return res.status(400).json({ error: 'userId, productId and quantity are required' });
+        if (!userId || !productId || !quantity || !paymentMethodId) {
+            return res.status(400).json({ error: 'userId, productId, quantity, and paymentMethodId are required' });
         }
 
-        const newOrder = await createOrder({ userId, productId, quantity });
+        const newOrder = await createOrder({ userId, productId, quantity, paymentMethodId });
+
+        // Publish order created event to message queue
+        await publishOrderPlaced(newOrder);
 
         res.status(201).json({ message: 'Order placed successfully', order: newOrder });
     } catch (err) {
@@ -127,12 +133,16 @@ const fetchUserOrdersController = async (req, res) => {
 const cancelOrderController = async (req, res) => {
     try {
         const { id } = req.params;
+        const { cancelReason } = req.body;
 
         if (!id) {
             return res.status(400).json({ error: 'Order ID is required' });
         }
 
-        const cancelledOrder = await cancelOrder(id);
+        const cancelledOrder = await cancelOrder(id, cancelReason);
+
+        // Optionally, you can publish an event to the message queue for order cancellations as well
+        await publishOrderCancelled(cancelledOrder);
 
         res.status(200).json({ message: 'Order cancelled successfully', order: cancelledOrder });
     } catch (err) {
@@ -151,12 +161,16 @@ const cancelOrderController = async (req, res) => {
 const returnOrderController = async (req, res) => {
     try {
         const { id } = req.params;
+        const { returnReason } = req.body;
 
         if (!id) {
             return res.status(400).json({ error: 'Order ID is required' });
         }
 
-        const returnedOrder = await returnOrder(id);
+        const returnedOrder = await returnOrder(id, returnReason);
+
+        // Optionally, you can publish an event to the message queue for order returns as well
+        await publishOrderReturned(returnedOrder);
 
         res.status(200).json({ message: 'Order returned successfully', order: returnedOrder });
     } catch (err) {

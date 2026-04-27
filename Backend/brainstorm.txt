@@ -14,3 +14,82 @@ Brain storm ideas
                 payment - per order payment status, userid, orderid
                 notification - userid, data from db, notification info
 
+
+RABBIT MQ
+
+export const QUEUES = {
+
+  // ── User Events ──────────────────────────────────
+  USER_CREATED:           'user.created',          // signup
+  USER_UPDATED:           'user.updated',          // profile update
+  USER_DELETED:           'user.deleted',          // account deleted
+
+  // ── Product Events ────────────────────────────────
+  PRODUCT_CREATED:        'product.created',       // admin creates product
+  PRODUCT_UPDATED:        'product.updated',       // admin updates product
+  PRODUCT_DELETED:        'product.deleted',       // admin deletes product
+
+  // ── Order Events ──────────────────────────────────
+  ORDER_PLACED:           'order.placed',          // user places order
+  ORDER_CANCELLED:        'order.cancelled',       // user cancels order
+  ORDER_RETURNED:         'order.returned',        // user returns order
+  ORDER_STATUS_UPDATED:   'order.status.updated',  // admin updates status
+
+  // ── Payment Events ────────────────────────────────
+  PAYMENT_SUCCESS:        'payment.success',       // payment succeeded
+  PAYMENT_FAILED:         'payment.failed',        // payment failed
+  PAYMENT_REFUNDED:       'payment.refunded',      // refund processed
+
+};
+
+```
+OrderService
+  Producer: order.placed, order.cancelled, order.returned, order.status.updated
+  Consumer: payment.success, payment.failed, payment.refunded
+
+PaymentService
+  Producer: payment.success, payment.failed, payment.refunded
+  Consumer: order.placed, order.cancelled, order.returned
+
+ProductService
+  Producer: product.created, product.updated, product.deleted
+  Consumer: order.placed, order.cancelled, order.returned
+
+UserService
+  Producer: user.created, user.updated, user.deleted
+  Consumer: none
+
+NotificationService
+  Producer: none
+  Consumer: user.created, order.status.updated, payment.success, payment.failed, payment.refunded
+
+CartService
+  Producer: none
+  Consumer: product.updated, product.deleted, user.deleted
+```
+
+
+# 1. Check all queues and message counts
+docker exec -it backend-rabbitmq-1 rabbitmqctl list_queues name messages consumers
+
+# 2. Peek at message payload in order.placed
+docker exec -it backend-rabbitmq-1 rabbitmqadmin get queue=order.placed ackmode=ack_requeue_true
+
+# 3. Check order.cancelled
+docker exec -it backend-rabbitmq-1 rabbitmqadmin get queue=order.cancelled ackmode=ack_requeue_true
+
+# 4. Check order.returned
+docker exec -it backend-rabbitmq-1 rabbitmqadmin get queue=order.returned ackmode=ack_requeue_true
+
+# 5. Check order.status.updated
+docker exec -it backend-rabbitmq-1 rabbitmqadmin get queue=order.status.updated ackmode=ack_requeue_true
+
+
+# Step 1 — place order via Postman, then check
+docker exec -it backend-rabbitmq-1 rabbitmqctl list_queues name messages consumers
+
+# Step 2 — see the actual message
+docker exec -it backend-rabbitmq-1 rabbitmqadmin get queue=order.placed ackmode=ack_requeue_true
+
+# Step 3 — watch logs live while hitting Postman
+docker compose logs order-service -f

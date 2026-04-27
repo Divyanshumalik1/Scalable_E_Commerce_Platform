@@ -13,14 +13,19 @@ datasource db {
 }
 
 model Order {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  productId   Int
-  quantity    Int
-  totalPrice  Float
-  status      OrderStatus @default(pending)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  productId         Int
+  quantity          Int
+  totalPrice        Float
+  status            OrderStatus @default(pending)
+  paymentMethodId   String      // from Stripe.js on frontend
+  paymentIntentId   String?     // set by PaymentService after Stripe charge
+  cancelReason      String?
+  returnReason      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
 }
 
 enum OrderStatus {
@@ -30,4 +35,5 @@ enum OrderStatus {
   shipped
   delivered
   returned
+  failed
 }

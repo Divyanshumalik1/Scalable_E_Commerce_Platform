@@ -1,4 +1,5 @@
 import { createProduct, updateProduct, deleteProduct, fetchProductDetails, listProducts } from '../services/product.service.js';
+import { publishProductCreated, publishProductUpdated, publishProductDeleted } from '../mq/producer.js';
 
 const createProductController = async( req, res) => {
     try{
@@ -9,6 +10,8 @@ const createProductController = async( req, res) => {
         }
         
         const product = await createProduct(req.body);
+
+        await publishProductCreated(product);
 
         return res.status(201).json({message: 'Product created successfully', product: product});
 
@@ -30,6 +33,8 @@ const updateProductController = async(req, res) => {
                 return res.status(404).json({message: 'Product not found'});
             }
 
+            await publishProductUpdated(updatedProduct);
+
             return res.status(200).json({message: 'Product updated successfully', product: updatedProduct});
 
         }catch(err){
@@ -48,6 +53,8 @@ const deleteProductController = async( req, res) => {
         if(!deletedProduct){
             return res.status(404).json({message: 'Product not found'});
         }
+
+        await publishProductDeleted(deletedProduct);
 
         return res.status(200).json({message: 'Product deleted successfully', product: deletedProduct});
 

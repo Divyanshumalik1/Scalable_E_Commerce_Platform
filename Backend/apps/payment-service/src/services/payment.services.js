@@ -1,4 +1,4 @@
-import prisma from "../../../product-service/src/config/db"
+import prisma from "../config/db.js";
 
 export const getAllPayments = async () => {
     try{
@@ -47,26 +47,24 @@ export const UpdatePaymentStatus = async (paymentId, status) => {
 }
 
 export const createPayment = async (paymentData) => {
-
-    try{
-
+    try {
         const payment = await prisma.payment.create({
             data: {
-                userId: parseInt(paymentData.userId),
-                orderId: parseInt(paymentData.orderId),
-                amount: parseFloat(paymentData.amount),
-                method: paymentData.method,
-                currency: paymentData.currency || 'USD',
+                userId:                parseInt(paymentData.userId),
+                orderId:               parseInt(paymentData.orderId),
+                amount:                parseFloat(paymentData.amount),
+                method:                paymentData.method,
+                currency:              paymentData.currency || 'USD',
+                status:                paymentData.status || 'pending',           // ← add
+                stripePaymentIntentId: paymentData.stripePaymentIntentId || null, // ← add
+                failureReason:         paymentData.failureReason || null,          // ← add
             }
-        })
+        });
 
-        if(!payment){
-            throw new Error('Failed to create payment');
-        }
-
+        if (!payment) throw new Error('Failed to create payment');
         return payment;
 
-    }catch(err){
+    } catch(err) {
         console.error("Error creating payment:", err);
         throw err;
     }
@@ -112,6 +110,24 @@ export const fetchPaymentDetails = async (paymentId) => {
         throw err;
     }
 }
+
+export const findPaymentByOrderId = async (orderId) => {
+    try{
+        const payment = await prisma.payment.findUnique({
+            where: {orderId: parseInt(orderId)}
+        })
+
+        if(!payment){
+            throw new Error('Payment not found for this order');
+        }
+
+        return payment;
+    }catch(err){
+        console.error("Error finding payment by order ID:", err);
+        throw err;
+    }
+    
+};
 
 export const processRefund = async (paymentId) => {
 

@@ -1,10 +1,9 @@
 
+import { createPayment, fetchUserPayments, fetchPaymentDetails, processRefund, getAllPayments, UpdatePaymentStatus } from "../services/payment.services.js";
 
 // // Admin routes 
 // paymentRouter.get('/payment', GetallPaymentsController); // get all payments (admin)
 // paymentRouter.post('/payment/:id/status', updatePaymentStatusController); // update payment status (admin)
-
-
 
 export const updatePaymentStatusController = async (req, res) => {
 
@@ -16,7 +15,7 @@ export const updatePaymentStatusController = async (req, res) => {
             return res.status(400).json({ message: 'Payment ID and status are required' });
         }
 
-        const updatedPayment = await updatePaymentStatus(id, status);
+        const updatedPayment = await UpdatePaymentStatus(id, status);
 
         if (!updatedPayment) {
             return res.status(404).json({ message: 'Payment not found' });

@@ -1,20 +1,26 @@
-FROM node:22-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Install deps
-COPY package*.json ./
-RUN npm install
+# Copy workspace config
+COPY package.json pnpm-workspace.yaml ./
 
-# Copy source
-COPY . .
+# Copy shared package
+COPY packages/shared ./packages/shared
+
+# Copy service files
+COPY apps/order-service/package.json ./apps/order-service/
+COPY apps/order-service/ ./apps/order-service/
+
+# Install pnpm and dependencies
+RUN npm install -g pnpm
+RUN pnpm install --filter order-service
+
+WORKDIR /app/apps/order-service
 
 # Generate Prisma client
-RUN npx prisma generate
-
-# Build (if TypeScript)
-# RUN npm run build
+RUN npx prisma generate --schema=./prisma/order.schema.prisma
 
 EXPOSE 3003
 
-CMD ["npm", "run", "start"]
+CMD ["node", "order_app.js"]

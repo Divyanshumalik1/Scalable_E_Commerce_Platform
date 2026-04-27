@@ -28,7 +28,7 @@ export const createOrder = async (orderData) => {
     const data = await response.json();
     const product = data.product;
 
-     if (!product) {
+    if (!product) {
         throw new Error('Product not found');
     }
 
@@ -40,7 +40,11 @@ export const createOrder = async (orderData) => {
             totalPrice: parseFloat(product.price) * parseInt(quantity),
             createdAt: new Date(),
             updatedAt: new Date(),
-            status: 'pending'
+            status: 'pending',
+            paymentMethodId: orderData.paymentMethodId,
+            paymentIntentId: orderData.paymentIntentId,
+            cancelReason: orderData.cancelReason,
+            returnReason: orderData.returnReason
         }
     });
 
@@ -64,13 +68,13 @@ export const getOrderDetails = async (orderId) => {
         throw new Error('Order not found');
     }
 
-    const { userId, productId, quantity, totalPrice, status, createdAt } = orderData;
+    const { userId, productId, quantity, totalPrice, status, createdAt, updatedAt, paymentMethodId, paymentIntentId, cancelReason, returnReason } = orderData;
 
-    if (!userId || !productId || !quantity || !totalPrice || !status || !createdAt) {
+    if (!userId || !productId || !quantity || !totalPrice || !status || !createdAt || !updatedAt || !paymentMethodId) {
         throw new Error('Incomplete order data');
     }
 
-    return { userId, productId, quantity, totalPrice, status, createdAt };
+    return { userId, productId, quantity, totalPrice, status, createdAt, updatedAt, paymentMethodId, paymentIntentId, cancelReason, returnReason };
 
 }
 
@@ -92,7 +96,7 @@ export const fetchUserOrders = async (userId) => {
 
 
 // orderRouter.post('/order/:id/cancel', cancelOrderController); // cancel an order
-export const cancelOrder = async (orderId) => {
+export const cancelOrder = async (orderId, cancelReason) => {
 
     const order = await prisma.order.findUnique({
         where: { id: parseInt(orderId) }
@@ -109,20 +113,20 @@ export const cancelOrder = async (orderId) => {
     try {
         const cancelledOrder = await prisma.order.update({
             where: { id: parseInt(orderId) },
-            data: { status: 'cancelled', updatedAt: new Date() }
+            data: { status: 'cancelled', updatedAt: new Date(), cancelReason: order.cancelReason ?? 'Cancelled by user' }
         });
 
         return cancelledOrder;
 
     } catch (err) {
-       throw new Error('Error cancelling order: ' + err.message);
+        throw new Error('Error cancelling order: ' + err.message);
     }
 }
 
 
 // orderRouter.post('/order/:id/return', returnOrderController); // return/exchange items in an order 
 // ************************** add exchange functionality later **************************
-export const returnOrder = async (orderId) => {
+export const returnOrder = async (orderId, returnReason) => {
 
     const order = await prisma.order.findUnique({
         where: { id: parseInt(orderId) }
@@ -139,12 +143,12 @@ export const returnOrder = async (orderId) => {
     try {
         const returnedOrder = await prisma.order.update({
             where: { id: parseInt(orderId) },
-            data: { status: 'returned', updatedAt: new Date() }
+            data: { status: 'returned', updatedAt: new Date(), returnReason: returnReason ?? 'Returned by user' }
         });
 
         return returnedOrder;
 
     } catch (err) {
-       throw new Error('Error returning order: ' + err.message);
+        throw new Error('Error returning order: ' + err.message);
     }
 }
