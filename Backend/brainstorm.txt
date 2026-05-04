@@ -93,3 +93,37 @@ docker exec -it backend-rabbitmq-1 rabbitmqadmin get queue=order.placed ackmode=
 
 # Step 3 — watch logs live while hitting Postman
 docker compose logs order-service -f
+
+
+
+
+////////////////////////////////////
+
+
+Based on the project requirements, here's what's left:
+Still needed from the project:
+⏳ Notification Service  — SendGrid + Twilio
+⏳ API Gateway           — Kong, Traefik, or NGINX
+⏳ Service Discovery     — Consul or Eureka
+⏳ Centralized Logging   — ELK stack (Elasticsearch, Logstash, Kibana)
+⏳ CI/CD Pipeline        — GitHub Actions
+⏳ Monitoring            — Prometheus + Grafana
+⏳ Production Deploy     — Kubernetes or Docker Swarm
+What you've already covered:
+✅ Microservices architecture
+✅ Docker + Docker Compose
+✅ PostgreSQL + Prisma ORM
+✅ RabbitMQ producers/consumers
+✅ Redis
+✅ REST APIs
+✅ Stripe payment integration
+✅ MongoDB
+✅ Authentication
+Honest priority for resume impact:
+1. Notification Service  — completes the core
+2. API Gateway (NGINX)   — essential for production
+3. GitHub Actions CI/CD  — very high resume value
+4. Prometheus + Grafana  — monitoring, great to show
+5. ELK stack             — nice to have
+6. Kubernetes            — separate learning path
+Finish NotificationService first then API Gateway — those two complete the core project. Want to proceed?

@@ -70,6 +70,7 @@ export const createPayment = async (paymentData) => {
     }
 }
 
+// 
 export const fetchUserPayments = async (userId) => {
 
     try{
@@ -110,7 +111,7 @@ export const fetchPaymentDetails = async (paymentId) => {
         throw err;
     }
 }
-
+// This function is used by the admin to find the payment associated with a specific order, which can be useful for troubleshooting and customer support
 export const findPaymentByOrderId = async (orderId) => {
     try{
         const payment = await prisma.payment.findUnique({

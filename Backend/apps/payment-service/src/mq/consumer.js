@@ -72,3 +72,4 @@ export const consumeOrderReturned = async (callback) => {
 
     console.log(`✅ Consumer set up for queue: ${QUEUES.ORDER_RETURNED}`);
 };
+

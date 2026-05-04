@@ -30,14 +30,13 @@ export const fetchOrders = async (query) => {
 
 // orderRouter.put('/order/:id/status', updateOrderStatusController); // update order status (admin)
 export const updateOrders = async (orderId, status) => {
+    const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returned', 'failed']; // ✅ added failed
 
-        const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returned'];
+    if (!validStatuses.includes(status)) {
+        throw new Error('Invalid status value');
+    }
 
-        if (!validStatuses.includes(status)) {
-           throw new Error('Invalid status value');
-        }
-
-         try {
+    try {
         const updatedOrder = await prisma.order.update({
             where: { id: parseInt(orderId) },
             data: { status: status, updatedAt: new Date() }
@@ -47,4 +46,12 @@ export const updateOrders = async (orderId, status) => {
     } catch (err) {
         throw new Error('Error updating order status: ' + err.message);
     }
+}
+
+
+// ✅ add this for handlePaymentRefunded
+export const getOrderById = async (orderId) => {
+    return await prisma.order.findUnique({
+        where: { id: parseInt(orderId) }
+    });
 }
