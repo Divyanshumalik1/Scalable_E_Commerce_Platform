@@ -83,9 +83,16 @@ const fetchProductDetailsController = async( req, res) => {
 const listProductsController = async(req, res) => {
     try{
         
-        const products = await listProducts(req.query);
+        const { products, total, page, limit } = await listProducts(req.query);
 
-        return res.status(200).json({message: 'Products fetched successfully', products: products});
+        return res.status(200).json({
+            message: 'Products fetched successfully',
+            products,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        });
 
     }catch(err){
         return res.status(500).json({message: 'Internal server error'});

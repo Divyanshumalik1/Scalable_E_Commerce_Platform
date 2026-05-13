@@ -14,9 +14,9 @@ productRouter.delete('/product/:id', deleteProductController);
 
 
 // Unprotected routes for all users to view products and details
-productRouter.get('/product/:id', fetchProductDetailsController);
-
 productRouter.get('/product/list', listProductsController);
+
+productRouter.get('/product/:id', fetchProductDetailsController);
 
 
 export default productRouter;

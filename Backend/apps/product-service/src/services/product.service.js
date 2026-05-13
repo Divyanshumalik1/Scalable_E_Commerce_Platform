@@ -102,17 +102,22 @@ const listProducts = async (productQuery) => {
         const filters = {};
 
         if (category) filters.category = category;
-        if (minPrice) filters.price = { gte: parseFloat(minPrice) };
-        if (maxPrice) filters.price = { lte: parseFloat(maxPrice) };
+
+        const priceFilter = {};
+        if (minPrice) priceFilter.gte = parseFloat(minPrice);
+        if (maxPrice) priceFilter.lte = parseFloat(maxPrice);
         if (Object.keys(priceFilter).length > 0) filters.price = priceFilter;
 
-        const products = await prisma.product.findMany({
-            where: filters,
-            skip: (page - 1) * limit,
-            take: parseInt(limit)
-        });
+        const [products, total] = await prisma.$transaction([
+            prisma.product.findMany({
+                where: filters,
+                skip: (parseInt(page) - 1) * parseInt(limit),
+                take: parseInt(limit)
+            }),
+            prisma.product.count({ where: filters })
+        ]);
 
-        return products;
+        return { products, total, page: parseInt(page), limit: parseInt(limit) };
 
     } catch (err) {
         throw new Error('Error listing products: ' + err.message);
