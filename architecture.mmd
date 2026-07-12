@@ -1,0 +1,80 @@
+flowchart LR
+    User["Client\nUser / Admin"] --> FE["Next.js Frontend\nStore + Admin UI"]
+    FE --> GW["Nginx Gateway\n/api/users, /api/products, /api/order, /api/payments"]
+
+    subgraph Backend["Backend Services"]
+        US["User Service\nExpress + Mongoose"]
+        PS["Product Service\nExpress + Prisma"]
+        OS["Order Service\nExpress + Prisma"]
+        PYS["Payment Service\nExpress + Prisma"]
+        NS["Notification Service\nConsumers + Email"]
+    end
+
+    GW --> US
+    GW --> PS
+    GW --> OS
+    GW --> PYS
+
+    subgraph Infra["Infrastructure Layer"]
+        Mongo["MongoDB\nusers_db"]
+        PG["PostgreSQL\nproducts_db / orders_db / payments_db"]
+        Redis["Redis\ncache & transient state"]
+        MQ["RabbitMQ\nasync event bus"]
+        SMTP["SendGrid / SMTP"]
+    end
+
+    US --> Mongo
+    US --> Redis
+    US --> MQ
+
+    PS --> PG
+    PS --> Redis
+    PS --> MQ
+
+    OS --> PG
+    OS --> Redis
+    OS --> MQ
+
+    PYS --> PG
+    PYS --> Redis
+    PYS --> MQ
+
+    NS --> Redis
+    NS --> MQ
+    NS --> SMTP
+
+    MQ -. event-driven flow .-> NS
+    MQ -. event-driven flow .-> OS
+    MQ -. event-driven flow .-> PYS
+    MQ -. event-driven flow .-> PS
+    MQ -. event-driven flow .-> US
+
+    subgraph Shared["Shared Packages"]
+        SH["Shared Modules\nlogger / queue / message helpers"]
+    end
+
+    US -. uses .-> SH
+    PS -. uses .-> SH
+    OS -. uses .-> SH
+    PYS -. uses .-> SH
+    NS -. uses .-> SH
+
+    subgraph Dev["Developer Tools"]
+        PR1["Prisma Studio\nProducts"]
+        PR2["Prisma Studio\nOrders"]
+        PR3["Prisma Studio\nPayments"]
+    end
+
+    PS --> PR1
+    OS --> PR2
+    PYS --> PR3
+
+    classDef app fill:#7c3aed,stroke:#5b21b6,color:#fff,stroke-width:2px;
+    classDef infra fill:#0f172a,stroke:#475569,color:#fff,stroke-width:2px;
+    classDef shared fill:#1d4ed8,stroke:#1e40af,color:#fff,stroke-width:2px;
+    classDef dev fill:#065f46,stroke:#047857,color:#fff,stroke-width:2px;
+
+    class FE,GW,US,PS,OS,PYS,NS app;
+    class Mongo,PG,Redis,MQ,SMTP infra;
+    class SH shared;
+    class PR1,PR2,PR3 dev;
