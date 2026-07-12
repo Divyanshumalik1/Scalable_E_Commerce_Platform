@@ -2,11 +2,13 @@ import express from 'express';
 import orderRouter from "./src/routes/order.routes.js";
 import { connect } from "@ecommerce/shared/mq";
 import { startConsumers } from './src/consumers/index.js';
+import cors from 'cors';
 
 const orderApp = express();
 
+orderApp.use(cors());
 orderApp.use(express.json());
-orderApp.use('/api', orderRouter);
+orderApp.use('/api/order', orderRouter);
 
 await connect();
 await startConsumers();

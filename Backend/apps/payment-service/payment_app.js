@@ -2,6 +2,7 @@ import express from 'express';
 import paymentRouter from "./src/routes/payment.routes.js";
 import { connect } from "@ecommerce/shared/mq";
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -9,6 +10,7 @@ import { startConsumers } from './src/consumers/index.js';
 
 const paymentApp = express();
 
+paymentApp.use(cors());
 paymentApp.use(express.json());
 paymentApp.use('/api', paymentRouter);
 

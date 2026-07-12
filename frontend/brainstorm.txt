@@ -1,0 +1,12 @@
+But depending on how far you want to take this, common things people add next:
+Useful additions
+
+GET /product/list with pagination + filtering — your comment even mentions it but it may not be implemented yet. Query params like ?page=1&limit=20&category=electronics&sort=price
+Search endpoint — GET /product/search?q=headphones or just bake it into list
+Bulk delete — DELETE /products with an array of IDs in body
+
+If this is a real storefront (not just admin)
+
+Categories as their own resource — GET /categories
+Product images — upload endpoint
+Inventory/stock adjustment endpoint separate from full edit — PATCH /product/:id/stock
